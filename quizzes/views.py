@@ -15,7 +15,7 @@ from datetime import datetime
 from answer.models import TakeAnswer
 from answer.serializers import TakeAnswerSerializer
 from rest_framework.renderers import JSONRenderer
-from evaluate.similarity import Similarity
+# from evaluate.similarity import Similarity
 import random
 
 # Create your views here.
@@ -109,7 +109,7 @@ class SubmitView(APIView):
             ]
         }
         """
-        similarity = Similarity()
+        # similarity = Similarity()
 
         data = request.data
         data = data['data']
@@ -120,7 +120,7 @@ class SubmitView(APIView):
                 x = row['student_answer'].lower()
                 y = Question.objects.get(id=row['question']).answer.lower()
                 print((x, y))
-                row['similarity'] = similarity.calculate(x, y)[0][0]
+                # row['similarity'] = similarity.calculate(x, y)[0][0]
                 row['take_id'] = take_id.id
 
                 serializer = TakeAnswerSerializer(data=row)
@@ -164,36 +164,36 @@ class DetailReportView(APIView):
 class CalculateView(APIView):
 
     def get(self, request, quiz_id, format=None):
-        #sim = Similarity()
-        threshold = 0.7
-        take_id_object = TakeQuiz.objects.filter(quiz=quiz_id)
-        for i in take_id_object.iterator():
-            take_answer_object = TakeAnswer.objects.filter(take_id=i.id)
+        # #sim = Similarity()
+        # threshold = 0.7
+        # take_id_object = TakeQuiz.objects.filter(quiz=quiz_id)
+        # for i in take_id_object.iterator():
+        #     take_answer_object = TakeAnswer.objects.filter(take_id=i.id)
 
-            score = 0
-            sum_similarity = 0
-            for j in take_answer_object.iterator():
-                question_id = j.question_id
-                answer = Question.objects.get(id=question_id).answer.lower()
-                student_answer = j.student_answer.lower()
+        #     score = 0
+        #     sum_similarity = 0
+        #     for j in take_answer_object.iterator():
+        #         question_id = j.question_id
+        #         answer = Question.objects.get(id=question_id).answer.lower()
+        #         student_answer = j.student_answer.lower()
 
-                #similarity = sim.calculate(student_answer, answer)[0][0]
-                similarity = random.uniform(0,1)
-                sum_similarity += similarity
-                true_or_false = False
-                if similarity >= threshold:
-                    true_or_false = True
-                    score += 1
-                a = TakeAnswerSerializer(j, data={'similarity':similarity, 'true_or_false':true_or_false}, partial=True)
-                if a.is_valid():
-                    a.save()
-            #print(score, take_answer_object.count())
-            score = score / take_answer_object.count() * 100
-            sum_similarity = sum_similarity / take_answer_object.count()
-            take_quiz = TakeQuiz.objects.get(id=i.id)
-            take_quiz_serializer = TakeQuizSerializer(take_quiz, data={'score':score, 'similarity':sum_similarity}, partial=True)
-            if take_quiz_serializer.is_valid():
-                take_quiz_serializer.save()
+        #         #similarity = sim.calculate(student_answer, answer)[0][0]
+        #         similarity = random.uniform(0,1)
+        #         sum_similarity += similarity
+        #         true_or_false = False
+        #         if similarity >= threshold:
+        #             true_or_false = True
+        #             score += 1
+        #         a = TakeAnswerSerializer(j, data={'similarity':similarity, 'true_or_false':true_or_false}, partial=True)
+        #         if a.is_valid():
+        #             a.save()
+        #     #print(score, take_answer_object.count())
+        #     score = score / take_answer_object.count() * 100
+        #     sum_similarity = sum_similarity / take_answer_object.count()
+        #     take_quiz = TakeQuiz.objects.get(id=i.id)
+        #     take_quiz_serializer = TakeQuizSerializer(take_quiz, data={'score':score, 'similarity':sum_similarity}, partial=True)
+        #     if take_quiz_serializer.is_valid():
+        #         take_quiz_serializer.save()
 
         data = {"message":"Yeay!!! the scores have been calculated"}
         return Response(data, status=status.HTTP_200_OK)
