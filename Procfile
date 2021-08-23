@@ -1,1 +1,1 @@
-web: gunicorn myexamee.wsgi --log-file -
+web: gunicorn backend.wsgi
